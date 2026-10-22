@@ -1,0 +1,509 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Taller de transmissions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: banc de proves — controls a l'esquerra, mecanisme animat i resultats a la dreta; una columna en mòbil */
+:root{
+  --paper:#eef2f5; --panel:#ffffff; --ink:#16202a; --muted:#566473; --line:#d3dbe3; --grid:#dfe6ec;
+  --motriu:#d9601a; --motriu-soft:#fbe6d8; --driven:#2c6c9c; --driven-alt:#2f8574; --belt:#353b42; --belt-mark:#c9d1d9;
+  --ok:#25744a; --ok-soft:#dcefe3; --bad:#b03e2a; --bad-soft:#f6e0db;
+  --f-display:"Archivo",system-ui,sans-serif; --f-body:"Atkinson Hyperlegible",system-ui,sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#11161c; --panel:#192029; --ink:#e5eaf0; --muted:#98a6b4; --line:#2b3641; --grid:#1b232c;
+  --motriu:#f08b47; --motriu-soft:#3a2617; --driven:#6aa7d6; --driven-alt:#6cc0aa; --belt:#c3ccd6; --belt-mark:#424b55;
+  --ok:#6cc58f; --ok-soft:#173225; --bad:#f08c78; --bad-soft:#3b1d17; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --paper:#11161c; --panel:#192029; --ink:#e5eaf0; --muted:#98a6b4; --line:#2b3641; --grid:#1b232c;
+  --motriu:#f08b47; --motriu-soft:#3a2617; --driven:#6aa7d6; --driven-alt:#6cc0aa; --belt:#c3ccd6; --belt-mark:#424b55;
+  --ok:#6cc58f; --ok-soft:#173225; --bad:#f08c78; --bad-soft:#3b1d17; color-scheme:dark }
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:8px 24px;margin-bottom:18px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,4vw,38px);line-height:1.05;margin:4px 0 0;letter-spacing:-.01em;text-wrap:balance}
+header p{margin:0;max-width:48ch;color:var(--muted)}
+.grid{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:880px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.controls{padding:16px;display:flex;flex-direction:column;gap:18px}
+.group{display:flex;flex-direction:column;gap:8px}
+.group h2{font-family:var(--f-display);font-weight:700;font-size:14px;margin:0;letter-spacing:.01em}
+.seg{display:flex;flex-wrap:wrap;gap:4px;background:var(--paper);padding:4px;border-radius:8px}
+.seg button{flex:1 1 auto;font:inherit;font-size:13.5px;border:0;background:transparent;color:var(--ink);padding:7px 9px;border-radius:6px;cursor:pointer;min-height:34px}
+.seg button[aria-checked="true"]{background:var(--panel);box-shadow:0 0 0 1px var(--line),0 1px 2px rgba(0,0,0,.08);font-weight:700}
+.seg button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--motriu);outline-offset:2px}
+.seg.types{display:grid;grid-template-columns:1fr 1fr}
+.size-row{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}
+.size-row label{display:flex;align-items:center;gap:7px;font-size:14px}
+.size-row output,.num{font-family:var(--f-mono);font-weight:600;font-size:14px;font-variant-numeric:tabular-nums}
+.size-row input{grid-column:1/-1;width:100%}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--c);flex:none}
+input[type=range]{accent-color:var(--motriu);height:24px}
+.n1row{display:flex;align-items:center;gap:8px}
+.n1row input[type=number]{width:76px;font:600 14px var(--f-mono);padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink)}
+.btn{font:700 14px var(--f-body);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:9px 12px;cursor:pointer;min-height:40px}
+.btn.primary{background:var(--motriu);border-color:var(--motriu);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+.stage-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.stage{position:relative;overflow:hidden}
+.stage canvas{display:block;width:100%;aspect-ratio:16/9;max-width:100%}
+@media (max-width:560px){.stage canvas{aspect-ratio:4/3.4}}
+.stage .tag{position:absolute;left:12px;top:10px;font-family:var(--f-mono);font-size:11.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;pointer-events:none}
+.results{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px}
+@media (max-width:700px){.results{grid-template-columns:minmax(0,1fr)}}
+.card{padding:16px}
+.ratio{display:flex;flex-direction:column;gap:8px}
+.ratio-big{font-family:var(--f-mono);font-weight:600;font-size:clamp(24px,3.4vw,32px);line-height:1.1;font-variant-numeric:tabular-nums}
+.ratio-big small{font-size:.55em;color:var(--muted);font-weight:400}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12.5px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--paper);border:1px solid var(--line)}
+.chip.red{background:var(--motriu-soft);border-color:transparent;color:var(--ink)}
+.ratio p{margin:0}
+.formula{font-family:var(--f-mono);font-size:13.5px;background:var(--paper);border-radius:6px;padding:8px 10px;overflow-x:auto;white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-weight:700;text-align:left;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:0 6px 6px;border-bottom:1px solid var(--line)}
+td{padding:7px 6px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+td.m{font-family:var(--f-mono)}
+tr:last-child td{border-bottom:0}
+.tablewrap{overflow-x:auto}
+.steps{margin:10px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-family:var(--f-mono);font-size:13px}
+.steps li{padding-left:2px}
+.rule{border-left:3px solid var(--motriu);padding:2px 0 2px 12px;margin-top:4px}
+.rule h3{font-family:var(--f-display);font-size:14px;margin:0 0 4px}
+.rule p{margin:0 0 6px;max-width:62ch}
+.repte{padding:16px;display:flex;flex-direction:column;gap:10px;border-color:var(--motriu)}
+.repte h2{font-family:var(--f-display);font-size:17px;margin:0}
+.repte p{margin:0}
+.repte .fields{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.repte label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:700}
+.repte input,.repte select{font:600 15px var(--f-mono);padding:7px 8px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);min-width:120px}
+.fb{padding:8px 10px;border-radius:6px;font-size:14px}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.bad{background:var(--bad-soft);color:var(--bad)}
+.q{font-family:var(--f-mono);color:var(--motriu);font-weight:600}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Tecnologia i Digitalització · 3r d'ESO · Mecanismes de transmissió</div>
+      <h1>Taller de transmissions</h1>
+    </div>
+    <p>Tria el mecanisme, canvia les mides de les rodes i la velocitat de la motriu. Observa com giren les conduïdes i comprova la relació de transmissió.</p>
+  </header>
+
+  <div class="grid">
+    <aside class="panel controls" aria-label="Controls del simulador">
+      <div class="group">
+        <h2>Mecanisme</h2>
+        <div class="seg types" role="radiogroup" aria-label="Tipus de mecanisme" data-key="type">
+          <button role="radio" data-val="gear">Engranatges</button>
+          <button role="radio" data-val="fric">Rodes de fricció</button>
+          <button role="radio" data-val="belt">Politges i corretja</button>
+          <button role="radio" data-val="chain">Cadena</button>
+        </div>
+        <div class="seg" role="radiogroup" aria-label="Tipus de corretja" data-key="belt" id="beltSeg">
+          <button role="radio" data-val="open">Corretja oberta</button>
+          <button role="radio" data-val="cross">Corretja creuada</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Nombre de rodes</h2>
+        <div class="seg" role="radiogroup" aria-label="Nombre de rodes" data-key="count">
+          <button role="radio" data-val="2">2</button>
+          <button role="radio" data-val="3">3</button>
+          <button role="radio" data-val="4">4</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2 id="sizesTitle">Mides</h2>
+        <div id="sizes" class="group" style="gap:12px"></div>
+      </div>
+
+      <div class="group">
+        <h2>Roda motriu</h2>
+        <label class="hint" for="n1">Velocitat (rpm)</label>
+        <div class="n1row">
+          <input type="range" id="n1" min="10" max="300" step="5" style="flex:1">
+          <input type="number" id="n1num" min="1" max="1000" step="1" aria-label="Velocitat de la motriu en rpm">
+        </div>
+        <div class="seg" role="radiogroup" aria-label="Sentit de gir de la motriu" data-key="dir">
+          <button role="radio" data-val="1">↻ Horari</button>
+          <button role="radio" data-val="-1">↺ Antihorari</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Animació</h2>
+        <div class="seg" role="radiogroup" aria-label="Velocitat de l'animació" data-key="speed">
+          <button role="radio" data-val="1">Real</button>
+          <button role="radio" data-val="0.3">Lenta</button>
+          <button role="radio" data-val="0.08">Molt lenta</button>
+        </div>
+        <button class="btn" id="play" type="button">Pausa</button>
+        <p class="hint">L'animació pot anar a càmera lenta. Els càlculs sempre fan servir la velocitat real.</p>
+      </div>
+
+      <div class="group">
+        <h2>Posa't a prova</h2>
+        <button class="btn primary" id="newRepte" type="button">Proposa'm un repte</button>
+      </div>
+    </aside>
+
+    <div class="stage-col">
+      <section class="panel repte" id="repte" hidden aria-live="polite">
+        <h2>Repte</h2>
+        <p id="repteText"></p>
+        <div class="fields">
+          <label for="ansN">Velocitat de sortida (rpm)<input id="ansN" inputmode="decimal" autocomplete="off" placeholder="p. ex. 45"></label>
+          <label for="ansDir">Sentit de gir<select id="ansDir"><option value="">Tria…</option><option value="1">↻ Horari</option><option value="-1">↺ Antihorari</option></select></label>
+          <button class="btn primary" id="check" type="button">Comprova</button>
+        </div>
+        <div id="fb" class="fb" hidden></div>
+        <div class="row">
+          <button class="btn" id="reveal" type="button">Mostra la solució</button>
+          <button class="btn" id="another" type="button">Un altre repte</button>
+          <button class="btn" id="exitRepte" type="button">Surt del repte</button>
+        </div>
+      </section>
+
+      <div class="panel stage">
+        <span class="tag" id="stageTag">Vista frontal</span>
+        <canvas id="cv" role="img" aria-label="Animació del mecanisme de transmissió"></canvas>
+      </div>
+
+      <div class="results">
+        <section class="panel card ratio" aria-live="polite">
+          <div class="eyebrow">Relació de transmissió</div>
+          <div class="ratio-big" id="ratioBig"></div>
+          <div class="chips" id="chips"></div>
+          <p id="ratioText"></p>
+          <div class="formula" id="formula"></div>
+          <ol class="steps" id="steps"></ol>
+        </section>
+        <section class="panel card">
+          <div class="eyebrow" style="margin-bottom:8px">Rodes del mecanisme</div>
+          <div class="tablewrap"><table>
+            <thead><tr><th>Roda</th><th id="thSize">Z</th><th>Velocitat</th><th>Sentit</th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table></div>
+          <div class="rule" id="rule" style="margin-top:16px"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const TYPES={
+  gear:{label:'Engranatges',sym:'Z',unit:'dents',min:8,max:60,step:1,tag:'Engranatges exteriors'},
+  fric:{label:'Rodes de fricció',sym:'d',unit:'mm',min:20,max:200,step:5,tag:'Rodes de fricció exteriors'},
+  belt:{label:'Politges i corretja',sym:'d',unit:'mm',min:20,max:200,step:5,tag:'Politges amb corretja'},
+  chain:{label:'Cadena',sym:'Z',unit:'dents',min:10,max:52,step:1,tag:'Plat, pinyó i cadena'}
+};
+const S={type:'gear',belt:'open',count:2,n1:60,dir:1,speed:0.3,playing:true,
+  sizes:{gear:[20,40,30,24],fric:[60,120,80,40],belt:[60,120,80,40],chain:[44,16,22,18]},repte:null};
+try{const t=localStorage.getItem('tt-type');if(t&&TYPES[t])S.type=t}catch(e){}
+if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){S.speed=0.08}
+
+const $=s=>document.querySelector(s);
+const fmt=(v,d=1)=>Number(v).toLocaleString('ca-ES',{maximumFractionDigits:d});
+const gcd=(a,b)=>{a=Math.abs(Math.round(a));b=Math.abs(Math.round(b));while(b){[a,b]=[b,a%b]}return a||1};
+const sub=n=>`<sub>${n}</sub>`;
+const flips=()=>S.type==='gear'||S.type==='fric'||(S.type==='belt'&&S.belt==='cross');
+const wheelColor=k=>k===0?'var(--motriu)':(k%2?'var(--driven)':'var(--driven-alt)');
+const name=k=>k===0?'Motriu':`Conduïda ${k}`;
+const dirTxt=d=>d>0?'↻ Horari':'↺ Antihorari';
+
+function compute(){
+  const sz=S.sizes[S.type].slice(0,S.count),n=[S.n1],dir=[S.dir],f=flips();
+  for(let k=1;k<sz.length;k++){n[k]=n[k-1]*sz[k-1]/sz[k];dir[k]=f?-dir[k-1]:dir[k-1]}
+  return {sz,n,dir};
+}
+const hidden=()=>S.repte&&!S.repte.revealed;
+
+/* ---------- controls ---------- */
+function syncSegs(){
+  document.querySelectorAll('.seg').forEach(seg=>{
+    const key=seg.dataset.key;
+    seg.querySelectorAll('button').forEach(b=>{
+      b.setAttribute('aria-checked',String(String(S[key])===b.dataset.val));
+      b.disabled=!!S.repte&&!S.repte.revealed&&['type','belt','count','dir'].includes(key);
+    });
+  });
+  $('#beltSeg').hidden=S.type!=='belt';
+}
+function buildSizes(){
+  const T=TYPES[S.type],box=$('#sizes');
+  $('#sizesTitle').textContent=T.sym==='Z'?'Nombre de dents (Z)':'Diàmetre (d, en mm)';
+  box.innerHTML='';
+  for(let k=0;k<S.count;k++){
+    const v=S.sizes[S.type][k];
+    const row=document.createElement('div');row.className='size-row';
+    row.innerHTML=`<label for="sz-${k}"><span class="dot" style="--c:${wheelColor(k)}"></span>${name(k)}</label>
+      <output id="szo-${k}" for="sz-${k}">${T.sym} = ${v}</output>
+      <input type="range" id="sz-${k}" min="${T.min}" max="${T.max}" step="${T.step}" value="${v}" ${hidden()?'disabled':''}>`;
+    box.appendChild(row);
+    row.querySelector('input').addEventListener('input',e=>{
+      S.sizes[S.type][k]=+e.target.value;$(`#szo-${k}`).textContent=`${T.sym} = ${e.target.value}`;update();
+    });
+  }
+}
+document.querySelectorAll('.seg').forEach(seg=>seg.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b||b.disabled)return;
+  const key=seg.dataset.key;let v=b.dataset.val;
+  if(key==='count'||key==='dir'||key==='speed')v=+v;
+  S[key]=v;
+  if(key==='type'){try{localStorage.setItem('tt-type',v)}catch(err){}}
+  if(key==='type'||key==='count')buildSizes();
+  syncSegs();update();
+}));
+const n1=$('#n1'),n1num=$('#n1num');
+function setN1(v){v=Math.max(1,Math.min(1000,Math.round(+v||0)));S.n1=v;n1.value=Math.min(300,Math.max(10,v));n1num.value=v;update()}
+n1.addEventListener('input',e=>setN1(e.target.value));
+n1num.addEventListener('change',e=>setN1(e.target.value));
+$('#play').addEventListener('click',()=>{S.playing=!S.playing;$('#play').textContent=S.playing?'Pausa':'Reprèn';dirty=true});
+
+/* ---------- results ---------- */
+function update(){
+  const {sz,n,dir}=compute(),T=TYPES[S.type],last=sz.length-1,H=hidden();
+  $('#stageTag').textContent=T.tag+(S.type==='belt'?(S.belt==='open'?' · oberta':' · creuada'):'');
+  $('#thSize').textContent=`${T.sym} (${T.unit})`;
+  // table
+  $('#tbody').innerHTML=sz.map((v,k)=>{
+    const hide=H&&k===last;
+    return `<tr><td><span style="display:inline-flex;align-items:center;gap:7px"><span class="dot" style="--c:${wheelColor(k)}"></span>${name(k)}</span></td>
+      <td class="m">${v}</td>
+      <td class="m">${hide?'<span class="q">?</span>':fmt(n[k])+' rpm'}</td>
+      <td>${hide?'<span class="q">?</span>':dirTxt(dir[k])}</td></tr>`}).join('');
+  // ratio
+  const g=gcd(sz[0],sz[last]),num=sz[0]/g,den=sz[last]/g,i=sz[0]/sz[last];
+  const s0=T.sym+sub(1),sN=T.sym+sub(last+1);
+  if(H){
+    $('#ratioBig').innerHTML='i = <span class="q">?</span>';
+    $('#chips').innerHTML='';
+    $('#ratioText').textContent='Calcula la velocitat i el sentit de la darrera conduïda. La solució apareixerà quan la comprovis o la demanis.';
+    $('#formula').innerHTML=`i = n${sub('sortida')} / n${sub('motriu')} = ${s0} / ${sN}`;
+    $('#steps').innerHTML='';
+  }else{
+    $('#ratioBig').innerHTML=den===1?`i = ${num}`:`i = ${num}/${den} <small>= ${fmt(i,3)}</small>`;
+    const kind=i<1?'Reductor':i>1?'Multiplicador':'Mateixa velocitat';
+    const same=dir[last]===dir[0];
+    $('#chips').innerHTML=`<span class="chip red">${kind}</span><span class="chip">Sortida: ${same?'mateix sentit':'sentit contrari'} que la motriu</span>`;
+    $('#ratioText').innerHTML=i===1?'La roda de sortida gira igual de ràpid que la motriu.'
+      :`Per cada volta de la motriu, la roda de sortida fa <strong>${fmt(i,2)}</strong> ${i===1?'volta':'voltes'}. ${i<1?'Guanya força però perd velocitat.':'Guanya velocitat però perd força.'}`;
+    $('#formula').innerHTML=`i = n${sub('sortida')} / n${sub('motriu')} = ${s0} / ${sN} = ${sz[0]} / ${sz[last]}`;
+    let st='';
+    for(let k=1;k<=last;k++){
+      st+=`<li>n${sub(k+1)} = n${sub(k)} · ${T.sym}${sub(k)} / ${T.sym}${sub(k+1)} = ${fmt(n[k-1])} · ${sz[k-1]} / ${sz[k]} = <strong>${fmt(n[k])} rpm</strong></li>`;
+    }
+    if(last>1)st+=`<li style="font-family:var(--f-body);list-style:none;margin-left:-20px;color:var(--muted)">Les rodes intermèdies no canvien la relació final: només compten la primera i l'última.${S.type==='gear'||S.type==='fric'?' Sí que canvien el sentit de gir.':''}</li>`;
+    $('#steps').innerHTML=st;
+  }
+  // rule
+  const R={
+    gear:['Engranatges','Les dents d\'una roda empenyen les de l\'altra, sense patinar. Dues rodes que engranen giren en <strong>sentits contraris</strong>.','n₁ · Z₁ = n₂ · Z₂'],
+    fric:['Rodes de fricció','Les rodes es toquen i es mouen pel fregament. Giren en <strong>sentits contraris</strong> i poden patinar si han de fer molta força.','n₁ · d₁ = n₂ · d₂'],
+    belt:S.belt==='open'?['Politges amb corretja oberta','La corretja uneix dues politges separades. Amb la corretja oberta giren en el <strong>mateix sentit</strong>.','n₁ · d₁ = n₂ · d₂']
+      :['Politges amb corretja creuada','Creuant la corretja, les politges giren en <strong>sentits contraris</strong>. La relació de velocitats no canvia.','n₁ · d₁ = n₂ · d₂'],
+    chain:['Plat, pinyó i cadena','La cadena encaixa a les dents de les rodes i no patina. Plat i pinyó giren en el <strong>mateix sentit</strong>, com a la bicicleta.','n₁ · Z₁ = n₂ · Z₂']
+  }[S.type];
+  $('#rule').innerHTML=`<h3>Recorda: ${R[0]}</h3><p>${R[1]}</p><div class="formula">${R[2]}</div>`;
+  dirty=true;
+}
+
+/* ---------- repte ---------- */
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function rnd(T){const steps=Math.floor((T.max-T.min)/T.step);return T.min+T.step*Math.floor(Math.random()*(steps+1))}
+function newRepte(){
+  const T=TYPES[S.type];
+  S.count=pick([2,2,3]);
+  const nice=S.type==='gear'||S.type==='chain'?[12,15,16,18,20,24,30,36,40,45,48]:[30,40,50,60,80,90,100,120,150,180];
+  for(let k=0;k<4;k++){let v=pick(nice.filter(x=>x>=T.min&&x<=T.max));S.sizes[S.type][k]=v}
+  if(S.sizes[S.type][0]===S.sizes[S.type][S.count-1])S.sizes[S.type][S.count-1]=pick(nice.filter(x=>x!==S.sizes[S.type][0]&&x>=T.min&&x<=T.max));
+  S.n1=pick([20,30,40,50,60,90,100,120,150,200,240]);S.dir=pick([1,-1]);
+  setN1(S.n1);
+  S.repte={revealed:false,wasPlaying:S.repte?S.repte.wasPlaying:S.playing};
+  S.playing=false;$('#play').textContent='Reprèn';$('#play').disabled=true;
+  $('#ansN').value='';$('#ansDir').value='';$('#fb').hidden=true;
+  const {sz}=compute();
+  const unitTxt=T.sym==='Z'?'dents':'mm de diàmetre';
+  const mech=S.type==='belt'?`politges amb corretja ${S.belt==='open'?'oberta':'creuada'}`:T.label.toLowerCase();
+  $('#repteText').innerHTML=`Mecanisme de ${mech} amb ${sz.length} rodes (${sz.map((v,k)=>`${name(k).toLowerCase()}: ${v} ${unitTxt}`).join('; ')}). La motriu gira a <strong>${S.n1} rpm</strong> en sentit <strong>${S.dir>0?'horari':'antihorari'}</strong>. A quina velocitat i en quin sentit gira la ${name(sz.length-1).toLowerCase()}?`;
+  $('#repte').hidden=false;buildSizes();syncSegs();update();
+  $('#repte').scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+function revealRepte(){
+  if(!S.repte)return;S.repte.revealed=true;S.playing=true;$('#play').textContent='Pausa';$('#play').disabled=false;
+  buildSizes();syncSegs();update();
+}
+function exitRepte(){
+  if(!S.repte)return;S.playing=S.repte.wasPlaying;S.repte=null;$('#repte').hidden=true;$('#play').disabled=false;
+  $('#play').textContent=S.playing?'Pausa':'Reprèn';buildSizes();syncSegs();update();
+}
+$('#newRepte').addEventListener('click',newRepte);
+$('#another').addEventListener('click',newRepte);
+$('#reveal').addEventListener('click',()=>{revealRepte();const {n,dir}=compute(),L=n.length-1;const fb=$('#fb');fb.hidden=false;fb.className='fb ok';fb.innerHTML=`Solució: ${fmt(n[L])} rpm, sentit ${dir[L]>0?'horari':'antihorari'}. Mira el càlcul pas a pas a sota.`});
+$('#exitRepte').addEventListener('click',exitRepte);
+$('#check').addEventListener('click',()=>{
+  const {n,dir}=compute(),L=n.length-1,fb=$('#fb');
+  const raw=$('#ansN').value.trim().replace(',','.'),v=parseFloat(raw),d=$('#ansDir').value;
+  fb.hidden=false;
+  if(raw===''||isNaN(v)||!d){fb.className='fb bad';fb.textContent='Escriu la velocitat en rpm i tria el sentit de gir abans de comprovar.';return}
+  const okN=Math.abs(v-n[L])<=Math.max(0.5,n[L]*0.01),okD=+d===dir[L];
+  if(okN&&okD){fb.className='fb ok';fb.innerHTML=`Correcte! La sortida gira a ${fmt(n[L])} rpm en sentit ${dir[L]>0?'horari':'antihorari'}.`;revealRepte()}
+  else{fb.className='fb bad';fb.innerHTML=[okN?'La velocitat és correcta.':'La velocitat no és correcta. Recorda: n₁ · '+TYPES[S.type].sym+'₁ = n₂ · '+TYPES[S.type].sym+'₂.',okD?'El sentit és correcte.':'El sentit no és correcte. Pensa quins contactes inverteixen el gir.'].join(' ')+' Torna-ho a provar.'}
+});
+
+/* ---------- canvas ---------- */
+const cv=$('#cv'),ctx=cv.getContext('2d');let W=0,H=0,dirty=true;
+function resize(){const r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;W=r.width;H=r.height;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);dirty=true}
+new ResizeObserver(resize).observe(cv);
+function C(){const s=getComputedStyle(document.documentElement),g=k=>s.getPropertyValue(k).trim();
+  return{paper:g('--paper'),panel:g('--panel'),ink:g('--ink'),muted:g('--muted'),line:g('--line'),grid:g('--grid'),motriu:g('--motriu'),driven:g('--driven'),alt:g('--driven-alt'),belt:g('--belt'),mark:g('--belt-mark')}}
+const col=(c,k)=>k===0?c.motriu:(k%2?c.driven:c.alt);
+
+let theta1=0,lastT=performance.now();
+function geom(){
+  const {sz}=compute(),t=S.type;
+  const r=sz.map(v=>t==='fric'||t==='belt'?v/2:v);
+  const outer=r.map(v=>t==='gear'?v+2:t==='chain'?v+1.5:v);
+  const x=[0];
+  for(let k=1;k<r.length;k++){const s=r[k-1]+r[k];x[k]=x[k-1]+((t==='gear'||t==='fric')?s:s+0.55*s+14)}
+  const minX=x[0]-outer[0],maxX=x[x.length-1]+outer[outer.length-1],maxR=Math.max(...outer);
+  const arrowPad=22,labelH=58,pad=16;
+  const sc=Math.min((W-2*pad-2*arrowPad)/(maxX-minX),(H-labelH-2*pad-2*arrowPad)/(2*maxR));
+  const offX=W/2-sc*(minX+maxX)/2,cy=pad+arrowPad+maxR*sc+((H-labelH-2*pad-2*arrowPad)-2*maxR*sc)/2;
+  return{sz,r,outer,x:x.map(v=>offX+v*sc),sc,cy,labelY:cy+maxR*sc+arrowPad+12};
+}
+function angles(G){
+  const th=[theta1],t=S.type,f=flips();
+  for(let k=1;k<G.sz.length;k++){
+    if(t==='gear'){const s=(0-th[k-1])*G.sz[k-1]/(2*Math.PI);th[k]=Math.PI-(2*Math.PI/G.sz[k])*(0.5-s)}
+    else th[k]=th[k-1]*G.sz[k-1]/G.sz[k]*(f?-1:1);
+  }
+  return th;
+}
+function toothed(cx,cy,r,Z,th,sc,add,ded){
+  const ro=(r+add)*sc,rr=(r-ded)*sc,pa=2*Math.PI/Z,P=(rad,a)=>[cx+rad*Math.cos(a),cy+rad*Math.sin(a)];
+  ctx.beginPath();
+  for(let k=0;k<Z;k++){const a=th+k*pa;
+    const pts=[P(rr,a-0.5*pa),P(rr,a-0.29*pa),P(ro,a-0.13*pa),P(ro,a+0.13*pa),P(rr,a+0.29*pa)];
+    pts.forEach((p,i)=>k===0&&i===0?ctx.moveTo(p[0],p[1]):ctx.lineTo(p[0],p[1]));}
+  ctx.closePath();
+}
+function hub(cx,cy,R,c,th,color){
+  ctx.fillStyle=c.ink;ctx.beginPath();ctx.arc(cx,cy,Math.max(4,R*0.16),0,7);ctx.fill();
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(cx,cy,Math.max(1.6,R*0.06),0,7);ctx.fill();
+  // marca per veure el gir
+  ctx.fillStyle=c.panel;ctx.strokeStyle=c.ink;ctx.lineWidth=1.2;
+  const mr=R*0.62;ctx.beginPath();ctx.arc(cx+mr*Math.cos(th),cy+mr*Math.sin(th),Math.max(3,R*0.08),0,7);ctx.fill();ctx.stroke();
+}
+function beltPath(x1,r1,x2,r2,cy,crossed){
+  const p=new Path2D(),D=x2-x1;
+  if(!crossed){const b=Math.acos(Math.max(-1,Math.min(1,(r1-r2)/D)));
+    p.moveTo(x1+r1*Math.cos(b),cy-r1*Math.sin(b));p.lineTo(x2+r2*Math.cos(b),cy-r2*Math.sin(b));
+    p.arc(x2,cy,r2,-b,b,false);p.lineTo(x1+r1*Math.cos(b),cy+r1*Math.sin(b));p.arc(x1,cy,r1,b,2*Math.PI-b,false);
+  }else{const b=Math.acos(Math.min(1,(r1+r2)/D));
+    p.moveTo(x1+r1*Math.cos(b),cy-r1*Math.sin(b));p.lineTo(x2-r2*Math.cos(b),cy+r2*Math.sin(b));
+    p.arc(x2,cy,r2,Math.PI-b,b-Math.PI,true);p.lineTo(x1+r1*Math.cos(b),cy+r1*Math.sin(b));p.arc(x1,cy,r1,b,2*Math.PI-b,false);}
+  p.closePath();return p;
+}
+function arrow(cx,cy,R,dir,color){
+  const a0=-Math.PI*0.8,a1=-Math.PI*0.2,lw=2.5,h=9;
+  ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=lw;ctx.lineCap='round';ctx.setLineDash([]);
+  ctx.beginPath();ctx.arc(cx,cy,R,a0,a1,false);ctx.stroke();
+  const a=dir>0?a1:a0,t=dir>0?[-Math.sin(a),Math.cos(a)]:[Math.sin(a),-Math.cos(a)],n=[Math.cos(a),Math.sin(a)],P=[cx+R*n[0],cy+R*n[1]];
+  ctx.beginPath();ctx.moveTo(P[0]+t[0]*h,P[1]+t[1]*h);
+  ctx.lineTo(P[0]-t[0]*h*0.35+n[0]*h*0.62,P[1]-t[1]*h*0.35+n[1]*h*0.62);
+  ctx.lineTo(P[0]-t[0]*h*0.35-n[0]*h*0.62,P[1]-t[1]*h*0.35-n[1]*h*0.62);ctx.closePath();ctx.fill();
+}
+function draw(){
+  if(!W)return;const c=C();ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=c.panel;ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle=c.grid;ctx.lineWidth=1;ctx.beginPath();
+  for(let x=12.5;x<W;x+=24){ctx.moveTo(x,0);ctx.lineTo(x,H)}for(let y=12.5;y<H;y+=24){ctx.moveTo(0,y);ctx.lineTo(W,y)}ctx.stroke();
+  const G=geom(),th=angles(G),{n,dir}=compute(),t=S.type,sc=G.sc,cy=G.cy,N=G.sz.length,last=N-1;
+  // eix de centres (línia de traç i punt)
+  ctx.strokeStyle=c.muted;ctx.globalAlpha=.5;ctx.lineWidth=1;ctx.setLineDash([14,4,2,4]);ctx.beginPath();
+  ctx.moveTo(G.x[0]-G.outer[0]*sc-10,cy);ctx.lineTo(G.x[last]+G.outer[last]*sc+10,cy);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+  // rodes
+  for(let k=0;k<N;k++){
+    const cx=G.x[k],r=G.r[k],R=r*sc,color=col(c,k);
+    ctx.lineJoin='round';
+    if(t==='gear'||t==='chain'){
+      if(t==='gear')toothed(cx,cy,r,G.sz[k],th[k],sc,2,2.5);else toothed(cx,cy,r,G.sz[k],th[k],sc,1.5,1.8);
+      ctx.fillStyle=color;ctx.fill();ctx.strokeStyle=c.ink;ctx.lineWidth=1.2;ctx.stroke();
+      // alleugeriments
+      const rr=(r-(t==='gear'?2.5:1.8))*sc;
+      if(rr>34){ctx.fillStyle=c.panel;for(let j=0;j<5;j++){const a=th[k]+j*2*Math.PI/5+Math.PI/5;ctx.beginPath();ctx.arc(cx+rr*0.55*Math.cos(a),cy+rr*0.55*Math.sin(a),rr*0.17,0,7);ctx.fill();ctx.stroke()}}
+      ctx.strokeStyle=c.ink;ctx.globalAlpha=.35;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.setLineDash([3,3]);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+      hub(cx,cy,rr,c,th[k],color);
+    }else{
+      ctx.fillStyle=color;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.fill();
+      if(t==='fric'){const w=Math.max(3,R*0.12);ctx.strokeStyle=c.belt;ctx.lineWidth=w;ctx.beginPath();ctx.arc(cx,cy,R-w/2,0,7);ctx.stroke()}
+      else{ctx.strokeStyle=c.ink;ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();ctx.globalAlpha=.4;ctx.beginPath();ctx.arc(cx,cy,R*0.84,0,7);ctx.stroke();ctx.globalAlpha=1}
+      ctx.strokeStyle=c.panel;ctx.lineWidth=Math.max(2,R*0.07);ctx.lineCap='round';
+      for(let j=0;j<4;j++){const a=th[k]+j*Math.PI/2;ctx.beginPath();ctx.moveTo(cx+R*0.2*Math.cos(a),cy+R*0.2*Math.sin(a));ctx.lineTo(cx+R*0.72*Math.cos(a),cy+R*0.72*Math.sin(a));ctx.stroke()}
+      hub(cx,cy,R,c,th[k]+Math.PI/4,color);
+    }
+  }
+  // corretges i cadenes
+  if(t==='belt'||t==='chain'){
+    for(let k=1;k<N;k++){
+      const bw=t==='belt'?Math.max(3,Math.min(8,sc*3.2)):Math.max(4,Math.min(9,sc*3.4));
+      const e=t==='belt'?bw/2:0;
+      const r1=G.r[k-1]*sc+e,r2=G.r[k]*sc+e;
+      const p=beltPath(G.x[k-1],r1,G.x[k],r2,cy,t==='belt'&&S.belt==='cross');
+      const off=-th[k-1]*r1;ctx.lineJoin='round';
+      if(t==='belt'){
+        ctx.setLineDash([]);ctx.strokeStyle=c.belt;ctx.lineWidth=bw;ctx.stroke(p);
+        ctx.setLineDash([7,13]);ctx.lineDashOffset=off;ctx.strokeStyle=c.mark;ctx.lineWidth=Math.max(1.5,bw*0.35);ctx.lineCap='butt';ctx.stroke(p);
+      }else{
+        const pitch=2*Math.PI*sc;
+        ctx.setLineDash([]);ctx.strokeStyle=c.belt;ctx.lineWidth=1.5;ctx.stroke(p);
+        ctx.setLineDash([pitch*0.62,pitch*0.38]);ctx.lineDashOffset=off;ctx.lineCap='butt';ctx.lineWidth=bw;ctx.stroke(p);
+        ctx.setLineDash([0.01,pitch]);ctx.lineDashOffset=off-pitch*0.81;ctx.lineCap='round';ctx.strokeStyle=c.panel;ctx.lineWidth=bw*0.5;ctx.stroke(p);
+      }
+      ctx.setLineDash([]);ctx.lineDashOffset=0;
+    }
+  }
+  // fletxes de sentit
+  for(let k=0;k<N;k++){if(hidden()&&k>0)continue;arrow(G.x[k],cy,G.outer[k]*sc+11,dir[k],col(c,k))}
+  // etiquetes
+  const spacing=N>1?Math.min(...G.x.slice(1).map((v,i)=>v-G.x[i])):999,short=spacing<104,T=TYPES[t];
+  ctx.textAlign='center';ctx.textBaseline='alphabetic';
+  for(let k=0;k<N;k++){
+    const x=G.x[k],y=G.labelY;
+    ctx.fillStyle=col(c,k);ctx.font='700 13px "Atkinson Hyperlegible", system-ui, sans-serif';
+    ctx.fillText(short?(k===0?'Motriu':'C'+k):name(k),x,y);
+    ctx.fillStyle=c.muted;ctx.font='400 12px "IBM Plex Mono", ui-monospace, monospace';
+    ctx.fillText(`${T.sym}${short?'':' '}=${short?'':' '}${G.sz[k]}`,x,y+16);
+    ctx.fillStyle=c.ink;ctx.font='600 12px "IBM Plex Mono", ui-monospace, monospace';
+    ctx.fillText(hidden()&&k===last?'? rpm':`${fmt(n[k],short?0:1)} rpm`,x,y+32);
+  }
+}
+function frame(now){
+  const dt=Math.min(0.05,(now-lastT)/1000);lastT=now;
+  if(S.playing&&!hidden()){theta1+=S.dir*S.n1/60*2*Math.PI*S.speed*dt;dirty=true}
+  if(dirty){draw();dirty=false}
+  requestAnimationFrame(frame);
+}
+const mq=matchMedia('(prefers-color-scheme: dark)');mq.addEventListener&&mq.addEventListener('change',()=>dirty=true);
+new MutationObserver(()=>dirty=true).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+document.fonts&&document.fonts.ready.then(()=>dirty=true);
+
+setN1(S.n1);buildSizes();syncSegs();update();resize();requestAnimationFrame(frame);
+</script>
+
+</body></html>
